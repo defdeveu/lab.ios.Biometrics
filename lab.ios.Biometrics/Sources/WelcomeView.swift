@@ -1,16 +1,21 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    @StateObject private var viewModel: WelcomeViewModel = WelcomeViewModel()
+
     var body: some View {
-        VStack {
-            Button { } label: {
-                NavigationLink(destination: ContentView()) {
-                    Text("Welcome")
-                }
-            }
-            .buttonStyle(SolidButtonStyle())
+        ZStack {
+            NavigationLink(destination: ContentView(),
+                           isActive: $viewModel.navigateToContent,
+                           label: { EmptyView() })
+
+            Button("Welcome", action: viewModel.enterContent)
+                .buttonStyle(SolidButtonStyle())
         }
         .padding()
+        .alert(isPresented: $viewModel.showError, content: {
+            Alert(title: Text(viewModel.error ?? "Undefined error"))
+        })
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { appTitle() }
     }

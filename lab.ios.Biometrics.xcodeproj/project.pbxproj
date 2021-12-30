@@ -16,6 +16,8 @@
 		FA1DA099277E04F00045D9C0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1DA098277E04F00045D9C0 /* Utils.swift */; };
 		FA1DA09B277E05370045D9C0 /* AppRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1DA09A277E05370045D9C0 /* AppRepository.swift */; };
 		FA1DA09D277E0CCC0045D9C0 /* FileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1DA09C277E0CCC0045D9C0 /* FileRepository.swift */; };
+		FA1DA09F277E1BB80045D9C0 /* BiometryPermissionRequester.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1DA09E277E1BB80045D9C0 /* BiometryPermissionRequester.swift */; };
+		FA1DA0A1277E27E00045D9C0 /* WelcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1DA0A0277E27E00045D9C0 /* WelcomeViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,8 @@
 		FA1DA098277E04F00045D9C0 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		FA1DA09A277E05370045D9C0 /* AppRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRepository.swift; sourceTree = "<group>"; };
 		FA1DA09C277E0CCC0045D9C0 /* FileRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileRepository.swift; sourceTree = "<group>"; };
+		FA1DA09E277E1BB80045D9C0 /* BiometryPermissionRequester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometryPermissionRequester.swift; sourceTree = "<group>"; };
+		FA1DA0A0277E27E00045D9C0 /* WelcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +88,7 @@
 				FA1DA084277E00770045D9C0 /* ContentView.swift */,
 				FA1DA096277E04A50045D9C0 /* ContentViewModel.swift */,
 				FA1DA092277E03590045D9C0 /* WelcomeView.swift */,
+				FA1DA0A0277E27E00045D9C0 /* WelcomeViewModel.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -94,6 +99,7 @@
 				FA1DA098277E04F00045D9C0 /* Utils.swift */,
 				FA1DA09A277E05370045D9C0 /* AppRepository.swift */,
 				FA1DA09C277E0CCC0045D9C0 /* FileRepository.swift */,
+				FA1DA09E277E1BB80045D9C0 /* BiometryPermissionRequester.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -168,6 +174,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA1DA09F277E1BB80045D9C0 /* BiometryPermissionRequester.swift in Sources */,
+				FA1DA0A1277E27E00045D9C0 /* WelcomeViewModel.swift in Sources */,
 				FA1DA09B277E05370045D9C0 /* AppRepository.swift in Sources */,
 				FA1DA085277E00770045D9C0 /* ContentView.swift in Sources */,
 				FA1DA09D277E0CCC0045D9C0 /* FileRepository.swift in Sources */,
@@ -305,8 +313,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"lab.ios.Biometrics/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Usage of FaceID for entering content";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -334,8 +344,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"lab.ios.Biometrics/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Usage of FaceID for entering content";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

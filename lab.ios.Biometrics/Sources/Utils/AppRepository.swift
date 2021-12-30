@@ -9,4 +9,8 @@ final class AppRepository {
     lazy var fileRepository: FileRepositoryProtocol = {
         FileRepository()
     }()
+
+    lazy var biometryPermissionRequester: BiometryPermissionRequesterProtocol = {
+        BiometryPermissionRequester()
+    }()
 }
