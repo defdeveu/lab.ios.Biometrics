@@ -1,49 +1,69 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    @StateObject private var viewModel: WelcomeViewModel = WelcomeViewModel()
+    @State private var viewModel: WelcomeViewModel
+
+    @MainActor
+    init(viewModel: WelcomeViewModel = AppRepository.makeWelcomeViewModel()) {
+        _viewModel = State(initialValue: viewModel)
+    }
 
     var body: some View {
-        ZStack {
-            NavigationLink(destination: ContentView(),
-                           isActive: $viewModel.navigateToContent,
-                           label: { EmptyView() })
+        @Bindable var viewModel = viewModel
 
-            Button("Welcome", action: viewModel.enterContent)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Welcome")
+                        .font(.largeTitle.bold())
+                    Text("Enter the content area and save a message in the app sandbox.")
+                        .foregroundStyle(.secondary)
+                }
+
+                Button {
+                    Task {
+                        await viewModel.enterContent()
+                    }
+                } label: {
+                    Label(
+                        viewModel.isAuthenticating ? "Authenticating…" : "Enter content",
+                        systemImage: "faceid"
+                    )
+                }
                 .buttonStyle(SolidButtonStyle())
-        }
-        .padding()
-        .alert(isPresented: $viewModel.showError, content: {
-            Alert(title: Text(viewModel.error ?? "Undefined error"))
-        })
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar { appTitle() }
-    }
-
-    @ToolbarContentBuilder
-    private func appTitle() -> some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            HStack {
-                AppImages.appTitleImage
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .colorInvert()
-                // TODO colorInvert as per the scheme
-                Text(AppStrings.appTitle)
-                    .font(.title.bold())
-                    .foregroundColor(AppColors.navigationForeground)
+                .disabled(viewModel.isAuthenticating)
             }
-            .padding(.bottom, 8)
+            .frame(maxWidth: 640, alignment: .leading)
+            .padding(24)
+        }
+        .navigationTitle(AppStrings.appTitle)
+        .toolbarTitleDisplayMode(.inline)
+        .labToolbar()
+        .navigationDestination(isPresented: $viewModel.isContentPresented) {
+            ContentView()
+        }
+        .alert(
+            "Authentication failed",
+            isPresented: Binding(
+                get: { viewModel.errorMessage != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        viewModel.clearError()
+                    }
+                }
+            )
+        ) {
+            Button("OK", role: .cancel, action: viewModel.clearError)
+        } message: {
+            Text(viewModel.errorMessage ?? "Unknown authentication error")
         }
     }
 }
 
-#if DEBUG
-@available(iOS 15.0, *)
-struct WelcomeView_Previews: PreviewProvider {
+struct WelcomeViewPreviews: PreviewProvider {
     static var previews: some View {
-        WelcomeView()
-            .previewInterfaceOrientation(.landscapeLeft)
+        NavigationStack {
+            WelcomeView()
+        }
     }
 }
-#endif

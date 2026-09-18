@@ -1,27 +1,37 @@
 import Foundation
+import Observation
 
-class WelcomeViewModel: ObservableObject {
-    @Published var navigateToContent: Bool = false
-    @Published var showError: Bool = false
-    @Published var error: String? = nil
+@MainActor
+@Observable
+final class WelcomeViewModel {
+    private(set) var isAuthenticating = false
+    var isContentPresented = false
+    private(set) var errorMessage: String?
 
-    private let biometryPermissionRequester: BiometryPermissionRequesterProtocol
+    @ObservationIgnored private let authenticator: any BiometricAuthenticating
 
-    init(biometryPermissionRequester: BiometryPermissionRequesterProtocol = AppRepository.shared.biometryPermissionRequester) {
-        self.biometryPermissionRequester = biometryPermissionRequester
+    init(authenticator: any BiometricAuthenticating) {
+        self.authenticator = authenticator
     }
 
-    func enterContent() {
-        error = nil
-
-        biometryPermissionRequester.request { [weak self] result in
-            switch result {
-            case .success:
-                self?.navigateToContent = true
-            case .failure(let error):
-                self?.error = error.description
-                self?.showError = true
-            }
+    func enterContent() async {
+        guard !isAuthenticating else {
+            return
         }
+
+        isAuthenticating = true
+        errorMessage = nil
+        defer { isAuthenticating = false }
+
+        do {
+            try await authenticator.authenticate()
+            isContentPresented = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func clearError() {
+        errorMessage = nil
     }
 }

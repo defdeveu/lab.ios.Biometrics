@@ -1,24 +1,40 @@
 import Foundation
+import Observation
 
-class ContentViewModel: ObservableObject {
+@MainActor
+@Observable
+final class ContentViewModel {
     private static let fileName = "message.txt"
-    @Published var message: String = "Demo message"
-    @Published var showError: Bool = false
 
-    private let fileRepository: FileRepositoryProtocol
+    var message = "Demo message"
+    private(set) var isSaving = false
+    private(set) var savedMessage: String?
+    private(set) var errorMessage: String?
 
-    init(fileRepository: FileRepositoryProtocol = AppRepository.shared.fileRepository) {
+    @ObservationIgnored private let fileRepository: any FileRepositoryProtocol
+
+    init(fileRepository: any FileRepositoryProtocol) {
         self.fileRepository = fileRepository
     }
 
-    func saveMessage() {
-        if !fileRepository.save(message: message, to: Self.fileName) {
-            showError = true
+    func saveMessage() async {
+        guard !isSaving else {
             return
         }
 
-        #if DEBUG
-        print(fileRepository.read(from: Self.fileName) ?? "File \(Self.fileName) is empty")
-        #endif
+        isSaving = true
+        errorMessage = nil
+        defer { isSaving = false }
+
+        do {
+            try await fileRepository.save(message: message, to: Self.fileName)
+            savedMessage = try await fileRepository.read(from: Self.fileName)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func clearError() {
+        errorMessage = nil
     }
 }
