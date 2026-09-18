@@ -2,43 +2,35 @@ import SwiftUI
 
 struct WelcomeView: View {
     var body: some View {
-        VStack {
-            Button { } label: {
-                NavigationLink(destination: ContentView()) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Welcome")
+                        .font(.largeTitle.bold())
+                    Text("Enter the content area and save a message in the app sandbox.")
+                        .foregroundStyle(.secondary)
                 }
-            }
-            .buttonStyle(SolidButtonStyle())
-        }
-        .padding()
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar { appTitle() }
-    }
 
-    @ToolbarContentBuilder
-    private func appTitle() -> some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            HStack {
-                AppImages.appTitleImage
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .colorInvert()
-                // TODO colorInvert as per the scheme
-                Text(AppStrings.appTitle)
-                    .font(.title.bold())
-                    .foregroundColor(AppColors.navigationForeground)
+                NavigationLink {
+                    ContentView()
+                } label: {
+                    Label("Enter content", systemImage: "lock.open")
+                }
+                .buttonStyle(SolidButtonStyle())
             }
-            .padding(.bottom, 8)
+            .frame(maxWidth: 640, alignment: .leading)
+            .padding(24)
         }
+        .navigationTitle(AppStrings.appTitle)
+        .toolbarTitleDisplayMode(.inline)
+        .labToolbar()
     }
 }
 
-#if DEBUG
-@available(iOS 15.0, *)
-struct WelcomeView_Previews: PreviewProvider {
+struct WelcomeViewPreviews: PreviewProvider {
     static var previews: some View {
-        WelcomeView()
-            .previewInterfaceOrientation(.landscapeLeft)
+        NavigationStack {
+            WelcomeView()
+        }
     }
 }
-#endif

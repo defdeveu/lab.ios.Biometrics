@@ -1,32 +1,58 @@
 import Foundation
 
-protocol FileRepositoryProtocol {
-    func save(message: String, to destination: String) -> Bool
-    func read(from source: String) -> String?
+protocol FileRepositoryProtocol: Sendable {
+    func save(message: String, to destination: String) async throws
+    func read(from source: String) async throws -> String?
 }
 
-final class FileRepository: FileRepositoryProtocol {
-    func save(message: String, to destination: String) -> Bool {
-        guard let url = documentDirectoryPath() else { return false }
-        let fileURL = url.appendingPathComponent(destination)
+enum FileRepositoryError: LocalizedError, Equatable {
+    case directoryUnavailable
+    case invalidFileName
 
-        do {
-            try message.write(to: fileURL, atomically: true, encoding: .utf8)
-        } catch {
-            return false
+    var errorDescription: String? {
+        switch self {
+        case .directoryUnavailable:
+            "The app's Documents directory is unavailable."
+        case .invalidFileName:
+            "The destination must be a single file name."
         }
+    }
+}
 
-        return true
+actor FileRepository: FileRepositoryProtocol {
+    private let directoryURL: URL?
+
+    init(directoryURL: URL? = FileManager.default.urls(
+        for: .documentDirectory,
+        in: .userDomainMask
+    ).first) {
+        self.directoryURL = directoryURL
     }
 
-    func read(from source: String) -> String? {
-        guard let url = documentDirectoryPath() else { return nil }
-        let fileURL = url.appendingPathComponent(source)
-
-        return try? String(contentsOf: fileURL, encoding: .utf8)
+    func save(message: String, to destination: String) throws {
+        let fileURL = try destinationURL(for: destination)
+        try message.write(to: fileURL, atomically: true, encoding: .utf8)
     }
 
-    private func documentDirectoryPath() -> URL? {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+    func read(from source: String) throws -> String? {
+        let fileURL = try destinationURL(for: source)
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+            return nil
+        }
+        return try String(contentsOf: fileURL, encoding: .utf8)
+    }
+
+    private func destinationURL(for fileName: String) throws -> URL {
+        guard !fileName.isEmpty,
+              fileName != ".",
+              fileName != "..",
+              (fileName as NSString).lastPathComponent == fileName
+        else {
+            throw FileRepositoryError.invalidFileName
+        }
+        guard let directoryURL else {
+            throw FileRepositoryError.directoryUnavailable
+        }
+        return directoryURL.appendingPathComponent(fileName, isDirectory: false)
     }
 }
