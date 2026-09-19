@@ -27,10 +27,8 @@ struct WelcomeView: View {
     }
 }
 
-struct WelcomeViewPreviews: PreviewProvider {
-    static var previews: some View {
-        NavigationStack {
-            WelcomeView()
-        }
+#Preview {
+    NavigationStack {
+        WelcomeView()
     }
 }
