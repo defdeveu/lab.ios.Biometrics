@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "2700"
+   LastUpgradeVersion = "2720"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -34,7 +34,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "FB6000000000000000000001"
-               BuildableName = "Biometrics labTests.xctest"
+               BuildableName = "lab.ios.BiometricsTests.xctest"
                BlueprintName = "lab.ios.BiometricsTests"
                ReferencedContainer = "container:lab.ios.Biometrics.xcodeproj">
             </BuildableReference>
