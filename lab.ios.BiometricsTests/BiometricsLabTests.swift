@@ -1,10 +1,12 @@
 import Foundation
-import XCTest
+import Testing
 @testable import lab_ios_Biometrics
 
 @MainActor
-final class FileRepositoryTests: XCTestCase {
-    func testRoundTripsUTF8Message() async throws {
+@Suite
+struct FileRepositoryTests {
+    @Test
+    func roundTripsUTF8Message() async throws {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(
@@ -17,76 +19,80 @@ final class FileRepositoryTests: XCTestCase {
         try await repository.save(message: "Árvíztűrő tükörfúrógép", to: "message.txt")
 
         let savedMessage = try await repository.read(from: "message.txt")
-        XCTAssertEqual(savedMessage, "Árvíztűrő tükörfúrógép")
+        #expect(savedMessage == "Árvíztűrő tükörfúrógép")
     }
 
-    func testRejectsPathTraversal() async {
+    @Test
+    func rejectsPathTraversal() async {
         let repository = FileRepository(directoryURL: FileManager.default.temporaryDirectory)
 
         do {
             try await repository.save(message: "message", to: "../message.txt")
-            XCTFail("Expected an invalid-file-name error")
+            Issue.record("Expected an invalid-file-name error")
         } catch {
-            XCTAssertEqual(error as? FileRepositoryError, .invalidFileName)
+            #expect(error as? FileRepositoryError == .invalidFileName)
         }
     }
 }
 
 @MainActor
-final class ContentViewModelTests: XCTestCase {
-    func testSavePublishesReadBackValue() async {
+@Suite
+struct ContentViewModelTests {
+    @Test
+    func savePublishesReadBackValue() async {
         let repository = RecordingFileRepository()
         let viewModel = ContentViewModel(fileRepository: repository)
         viewModel.message = "Saved message"
 
         await viewModel.saveMessage()
 
-        XCTAssertEqual(viewModel.savedMessage, "Saved message")
-        XCTAssertNil(viewModel.errorMessage)
-        XCTAssertFalse(viewModel.isSaving)
+        #expect(viewModel.savedMessage == "Saved message")
+        #expect(viewModel.errorMessage == nil)
+        #expect(!viewModel.isSaving)
         let writes = await repository.recordedWrites()
-        XCTAssertEqual(writes, ["message.txt": "Saved message"])
+        #expect(writes == ["message.txt": "Saved message"])
     }
 
-    func testSavePublishesStorageFailure() async {
+    @Test
+    func savePublishesStorageFailure() async {
         let repository = RecordingFileRepository(error: TestStorageError.failed)
         let viewModel = ContentViewModel(fileRepository: repository)
 
         await viewModel.saveMessage()
 
-        XCTAssertNil(viewModel.savedMessage)
-        XCTAssertEqual(viewModel.errorMessage, TestStorageError.failed.localizedDescription)
-        XCTAssertFalse(viewModel.isSaving)
+        #expect(viewModel.savedMessage == nil)
+        #expect(viewModel.errorMessage == TestStorageError.failed.localizedDescription)
+        #expect(!viewModel.isSaving)
     }
 }
 
 @MainActor
-final class WelcomeViewModelTests: XCTestCase {
-    func testSuccessfulAuthenticationPresentsContent() async {
+@Suite
+struct WelcomeViewModelTests {
+    @Test
+    func successfulAuthenticationPresentsContent() async {
         let viewModel = WelcomeViewModel(
             authenticator: StubBiometricAuthenticator(result: .success(()))
         )
 
         await viewModel.enterContent()
 
-        XCTAssertTrue(viewModel.isContentPresented)
-        XCTAssertNil(viewModel.errorMessage)
-        XCTAssertFalse(viewModel.isAuthenticating)
+        #expect(viewModel.isContentPresented)
+        #expect(viewModel.errorMessage == nil)
+        #expect(!viewModel.isAuthenticating)
     }
 
-    func testDeniedAuthenticationKeepsContentClosed() async {
+    @Test
+    func deniedAuthenticationKeepsContentClosed() async {
         let viewModel = WelcomeViewModel(
             authenticator: StubBiometricAuthenticator(result: .failure(.denied))
         )
 
         await viewModel.enterContent()
 
-        XCTAssertFalse(viewModel.isContentPresented)
-        XCTAssertEqual(
-            viewModel.errorMessage,
-            BiometricAuthenticationError.denied.localizedDescription
-        )
-        XCTAssertFalse(viewModel.isAuthenticating)
+        #expect(!viewModel.isContentPresented)
+        #expect(viewModel.errorMessage == BiometricAuthenticationError.denied.localizedDescription)
+        #expect(!viewModel.isAuthenticating)
     }
 }
 

@@ -16,7 +16,7 @@ private struct LabToolbarModifier: ViewModifier {
     func body(content: Content) -> some View {
         content.toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                AppImages.appTitleImage
+                Image(.logoDddStamp1905)
                     .resizable()
                     .renderingMode(.template)
                     .scaledToFit()
@@ -36,8 +36,4 @@ extension View {
 
 enum AppStrings {
     static let appTitle = "Biometrics Lab"
-}
-
-enum AppImages {
-    static let appTitleImage = Image("logo.ddd.stamp.1905")
 }
